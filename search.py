@@ -1,30 +1,28 @@
-import openai
-import qdrant_client
-from config import OPENAI_API_KEY, QDRANT_HOST, QDRANT_PORT
+import weaviate
+from config import WEAVIATE_URL, OPENAI_API_KEY
 
-client = qdrant_client.QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
-openai.api_key = OPENAI_API_KEY
+client = weaviate.connect_to_local(
+    port=8080,
+    grpc_port=50051,
+    headers={"X-OpenAI-Api-Key": OPENAI_API_KEY},
+)
 
-def embed_text(text: str):
-    response = openai.embeddings.create(
-        input=[text],
-        model="text-embedding-3-small"
-    )
-    return response.data[0].embedding
+collection = client.collections.get("Profile")
 
-def search_profiles(query: str):
-    vector = embed_text(query)
-    hits = client.search(
-        collection_name="creators",
-        query_vector=vector,
-        limit=3
-    )
-    results = []
-    for hit in hits:
-        payload = hit.payload
-        results.append({
-            "name": payload["name"],
-            "desc": payload["desc"],
-            "link": payload.get("link", "")
-        })
-    return results
+def search_profiles(query: str, score_threshold: float = 0.33):
+    try:
+        result = collection.query.hybrid(
+            query=query,
+            limit=10,
+            alpha=0.5,
+            return_metadata=["score"]
+        )
+        filtered = [
+            obj for obj in result.objects
+            if obj.metadata and obj.metadata.score >= score_threshold
+        ]
+        return filtered
+
+    except Exception as e:
+        print(f"[search_profiles] ❌ Ошибка: {e}")
+        return []
