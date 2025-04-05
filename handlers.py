@@ -59,8 +59,12 @@ async def handle_search(message: types.Message, query: str):
     if not results:
         await message.reply("Никого не нашёл.")
         return
-
-    response = "\n\n".join([f"👤 {r['name']}\n{r['desc']}\n{r['link']}" for r in results])
+    logging.warning(f"Results--------------------: {results}")
+    response = "\n\n".join([
+        f"👤 {r.properties['name']} (score: {r.metadata.score:.2f})"
+        f"\n{r.properties['desc']}\n{r.properties['link']}"
+        for r in results
+    ])
     await message.reply(response)
 
 
