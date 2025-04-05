@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.log
+*.tmp
+*.bak
+
+# Virtual env
+venv/
+.env
+
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Weaviate data (если хранишь локально)
+data/
+
+# Temp audio
+*.ogg
+*.mp3
+*.wav
+temp.*
+
+# Python notebooks
+*.ipynb_checkpoints
+
+# Docker
+*.pid
+*.sock
