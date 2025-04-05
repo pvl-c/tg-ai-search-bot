@@ -1,0 +1,6 @@
+python-dotenv
+aiogram
+openai
+requests
+qdrant-client
+weaviate-client
